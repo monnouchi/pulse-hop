@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync,readdirSync} from 'node:fs';
+const notice=readFileSync('public/THIRD_PARTY_NOTICES.txt','utf8');
+assert.match(notice,/Copyright \(C\) 2018-2021 Guy Bedford/);
+assert.match(notice,/SOFTWARE\.\s*$/);
+assert.equal(readFileSync('dist/THIRD_PARTY_NOTICES.txt','utf8'),notice);
+const html=readFileSync('dist/index.html','utf8');
+assert.match(html,/<link rel="license" href="\.\/THIRD_PARTY_NOTICES\.txt">/);
+const scripts=readdirSync('dist/assets').filter(name=>name.endsWith('.js'));
+assert.ok(scripts.length>0);
+for(const script of scripts)assert.ok(readFileSync(`dist/assets/${script}`,'utf8').includes(notice),`Missing bundled notice: ${script}`);
+console.log('Third-party notice verified: public copy, HTML link, bundled JavaScript.');
